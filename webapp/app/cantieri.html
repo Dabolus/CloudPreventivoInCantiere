@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  </head>
+  <body>
+    <a href="/">Menu principale</a>
+    <form id="formCantieri">
+      <input name="NomeCliente" placeholder="Nome cliente">
+      <input name="EmailCliente" placeholder="Email cliente">
+      <input name="Luogo" placeholder="Luogo">
+      <input type="file" name="Foto" multiple>
+      <button class="btn btn-success" id="invia">Invia</button>
+    </form>
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Nome Cliente</th>
+            <th>Email Cliente</th>
+            <th>Luogo</th>
+            <th>Foto</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="cantieri">
+        </tbody>
+      </table>
+    </div>
+    <script>
+      const form = document.getElementById('formCantieri');
+      const cantieri = document.getElementById('cantieri');
+
+      const aggiungiRiga = (riga) => {
+        const tr = document.createElement('tr');
+
+        const tdId = document.createElement('td');
+        tdId.textContent = riga.Id;
+        tr.appendChild(tdId);
+
+        const tdNomeCliente = document.createElement('td');
+        tdNomeCliente.textContent = riga.NomeCliente;
+        tr.appendChild(tdNomeCliente);
+
+        const tdEmailCliente = document.createElement('td');
+        tdEmailCliente.textContent = riga.EmailCliente;
+        tr.appendChild(tdEmailCliente);
+
+        const tdLuogo = document.createElement('td');
+        tdLuogo.textContent = riga.Luogo;
+        tr.appendChild(tdLuogo);
+
+        const tdFoto = document.createElement('td');
+        const ulFoto = document.createElement('ul');
+        (riga.Foto || []).forEach(foto => {
+          const liFoto = document.createElement('li');
+          const aFoto = document.createElement('a');
+          aFoto.textContent = foto;
+          aFoto.href = foto;
+          ulFoto.appendChild(liFoto);
+        });
+        tdFoto.appendChild(ulFoto);
+        tr.appendChild(tdFoto);
+
+        const tdPreventivo = document.createElement('td');
+        const buttonPreventivo = document.createElement('button');
+        buttonPreventivo.className = 'btn btn-info';
+        buttonPreventivo.textContent = 'Invia preventivo';
+        buttonPreventivo.addEventListener('click', (e) => {
+          e.preventDefault();
+          fetch(`/api/preventivo/${riga.Id}`, {
+            method: 'POST',
+          }).then(() => {
+            tdPreventivo.innerHTML = 'Inviato.';
+          });
+        });
+        tdPreventivo.appendChild(buttonPreventivo);
+        tr.appendChild(tdPreventivo);
+
+        cantieri.appendChild(tr);
+      };
+
+      fetch('/api/cantieri')
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === 200) {
+            res.data.forEach(aggiungiRiga);
+          }
+        });
+
+      document.getElementById('invia').addEventListener('click', (e) => {
+        e.preventDefault();
+        fetch('/api/cantieri', {
+          method: 'POST',
+          body: new FormData(form),
+        }).then(res => res.json())
+          .then(res => {
+            if (res.status === 200) {
+              window.location.reload();
+            }
+          });
+      });
+    </script>
+  </body>
+</html>

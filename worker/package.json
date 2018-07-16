@@ -1,0 +1,21 @@
+{
+  "name": "cloud-preventivo-in-cantiere-worker",
+  "version": "1.0.0",
+  "main": "main.js",
+  "author": "Giorgio Garasto",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "node main.js",
+    "dev": "nodemon -r dotenv/config main.js",
+    "prod": "node -r dotenv/config main.js"
+  },
+  "dependencies": {
+    "azure-storage": "^2.10.0",
+    "mssql": "^4.2.0"
+  },
+  "devDependencies": {
+    "dotenv": "^6.0.0",
+    "nodemon": "^1.18.2"
+  }
+}

@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  </head>
+  <body>
+    <a href="/">Menu principale</a>
+    <form id="formInterventi">
+      <input type="number" name="IdCantiere" placeholder="Id Cantiere">
+      <input name="TipoIntervento" placeholder="Tipo Intervento">
+      <input type="number" name="StimaCosto" placeholder="Stima Costo">
+      <input type="file" name="Foto" multiple>
+      <textarea name="Note" placeholder="Note..."></textarea>
+      <button class="btn btn-success" id="invia">Invia</button>
+    </form>
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Id Cantiere</th>
+            <th>Tipo Intervento</th>
+            <th>Stima Costo</th>
+            <th>Note</th>
+            <th>Foto</th>
+          </tr>
+        </thead>
+        <tbody id="interventi">
+        </tbody>
+      </table>
+    </div>
+    <script>
+      const form = document.getElementById('formInterventi');
+      const interventi = document.getElementById('interventi');
+      const aggiungiRiga = (riga) => {
+        const tr = document.createElement('tr');
+
+        const tdId = document.createElement('td');
+        tdId.textContent = riga.Id;
+        tr.appendChild(tdId);
+
+        const tdIdCantiere = document.createElement('td');
+        tdIdCantiere.textContent = riga.IdCantiere;
+        tr.appendChild(tdIdCantiere);
+
+        const tdTipoIntervento = document.createElement('td');
+        tdTipoIntervento.textContent = riga.TipoIntervento;
+        tr.appendChild(tdTipoIntervento);
+
+        const tdStimaCosto = document.createElement('td');
+        tdStimaCosto.textContent = riga.StimaCosto;
+        tr.appendChild(tdStimaCosto);
+
+        const tdNote = document.createElement('td');
+        tdNote.textContent = riga.Note;
+        tr.appendChild(tdNote);
+
+        const tdFoto = document.createElement('td');
+        const ulFoto = document.createElement('ul');
+        (riga.Foto || []).forEach(foto => {
+          const liFoto = document.createElement('li');
+          const aFoto = document.createElement('a');
+          aFoto.textContent = foto;
+          aFoto.href = foto;
+          ulFoto.appendChild(liFoto);
+        });
+        tdFoto.appendChild(ulFoto);
+        tr.appendChild(tdFoto);
+
+        interventi.appendChild(tr);
+      };
+
+      fetch('/api/interventi')
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === 200) {
+            res.data.forEach(aggiungiRiga);
+          }
+        });
+
+      document.getElementById('invia').addEventListener('click', (e) => {
+        e.preventDefault();
+        fetch('/api/interventi', {
+          method: 'POST',
+          body: new FormData(form),
+        }).then(res => res.json())
+          .then(res => {
+            if (res.status === 200) {
+              window.location.reload();
+            }
+          });
+      });
+    </script>
+  </body>
+</html>
